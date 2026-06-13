@@ -5,7 +5,11 @@ export async function POST() {
     message: "Logged out successfully",
   });
 
-  response.cookies.delete("authToken");
-
+  response.cookies.set("authToken", "", {
+    httpOnly: true,
+    path: "/",
+    maxAge: 0,
+  });
+  
   return response;
 }

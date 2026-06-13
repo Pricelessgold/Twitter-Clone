@@ -1,95 +1,91 @@
 import { makeSureDbIsReady } from "@/lib/db";
 import { Tweet } from "@/models/Tweet";
+import { getUserFromToken } from "@/lib/auth";
+import mongoose from "mongoose";
 
 export async function GET(req, { params }) {
   await makeSureDbIsReady();
 
   const { id } = await params;
 
-  const tweet = await Tweet.findById(id);
-
-  if (!tweet) {
-    return new Response(
-      JSON.stringify({ error: "Tweet not found" }),
-      { status: 404 }
-    );
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return Response.json({ error: "Invalid tweet id" }, { status: 400 });
   }
 
-  return new Response(JSON.stringify(tweet), {
-    status: 200,
-  });
+  const tweet = await Tweet.findById(id).populate("author", " username email");
+
+  if (!tweet) {
+    return Response.json({ error: "Tweet not found" }, { status: 404 });
+  }
+
+  return Response.json(tweet);
 }
 
 export async function PUT(req, { params }) {
   await makeSureDbIsReady();
-  const authToken = req.cookies.get("authToken");
-
-    if (!authToken) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-            status: 401,
-        });
-    }
 
   const { id } = await params;
+  const authToken = req.cookies.get("authToken")?.value;
+  const user = getUserFromToken(authToken);
 
-  const updatedData = await req.json();
-
-  try {
-    const updatedTweet = await Tweet.findByIdAndUpdate(
-      id,
-      updatedData,
-      { new: true }
-    );
-
-    if (!updatedTweet) {
-      return new Response(
-        JSON.stringify({ error: "Tweet not found" }),
-        { status: 404 }
-      );
-    }
-
-    return new Response(
-      JSON.stringify(updatedTweet),
-      { status: 200 }
-    );
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ error: "Error updating tweet" }),
-      { status: 500 }
-    );
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-}
 
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return Response.json({ error: "Invalid tweet id" }, { status: 400 });
+  }
+
+  const tweet = await Tweet.findById(id);
+
+  if (!tweet) {
+    return Response.json({ error: "Tweet not found" }, { status: 404 });
+  }
+
+  if (tweet.author.toString() !== user.id) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const body = await req.json();
+
+  if (!body.text || body.text.trim() === "") {
+    return Response.json({ error: "Tweet text is required" }, { status: 400 });
+  }
+
+  tweet.text = body.text;
+  await tweet.save();
+
+  const updatedTweet = await tweet.populate("author", "username email");
+
+  return Response.json(updatedTweet);
+}
 
 export async function DELETE(req, { params }) {
   await makeSureDbIsReady();
-  const authToken = req.cookies.get("authToken");
-  if (!authToken) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-    });
-  }
-  
+
   const { id } = await params;
+  const authToken = req.cookies.get("authToken")?.value;
+  const user = getUserFromToken(authToken);
 
-  try {
-    const deletedTweet = await Tweet.findByIdAndDelete(id);
-
-    if (!deletedTweet) {
-      return new Response(
-        JSON.stringify({ error: "Tweet not found" }),
-        { status: 404 }
-      );
-    }
-
-    return new Response(
-      JSON.stringify({ message: "Tweet deleted successfully" }),
-      { status: 200 }
-    );
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ error: "Error deleting tweet" }),
-      { status: 500 }
-    );
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return Response.json({ error: "Invalid tweet id" }, { status: 400 });
+  }
+
+  const tweet = await Tweet.findById(id);
+
+  if (!tweet) {
+    return Response.json({ error: "Tweet not found" }, { status: 404 });
+  }
+
+  if (tweet.author.toString() !== user.id) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  await Tweet.findByIdAndDelete(id);
+
+  return Response.json({ message: "Tweet deleted successfully" });
 }

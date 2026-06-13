@@ -1,85 +1,43 @@
 import { makeSureDbIsReady } from "@/lib/db";
 import { Tweet } from "@/models/Tweet";
+import { getUserFromToken } from "@/lib/auth";
+import { User } from "@/models/User";
+
+export async function GET() {
+  await makeSureDbIsReady();
+
+  const tweets = await Tweet.find({})
+    .populate("author", " username email ")
+    .sort({ createdAt: -1 });
+
+  return Response.json(tweets);
+}
 
 export async function POST(req) {
   await makeSureDbIsReady();
 
-  const authToken = req.cookies.get("authToken");
+  const authToken = req.cookies.get("authToken")?.value;
+  const user = getUserFromToken(authToken);
 
-  if (!authToken) {
-    return new Response(
-      JSON.stringify({ error: "Unauthorized TEST" }),
-      { status: 401 }
-    );
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json();
 
-  try {
-    const newTweet = await Tweet.create(body);
-
-    return new Response(JSON.stringify(newTweet), {
-      status: 201,
-    });
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ error: "Error creating tweet" }),
-      { status: 500 }
+  if (!body.text || body.text.trim() === "") {
+    return Response.json(
+      { error: "Tweet text is required" },
+      { status: 400 }
     );
   }
-}
 
+  const tweet = await Tweet.create({
+    text: body.text,
+    author: user.id,
+  });
 
-export async function GET(req) {
-  await makeSureDbIsReady();
+  const populatedTweet = await tweet.populate("author", " username email ");
 
-  try {
-    const tweets = await Tweet.find({}).sort({ createdAt: -1 });
-
-    return new Response(JSON.stringify(tweets), {
-      status: 200,
-    });
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ error: "Error fetching tweets" }),
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(req) {
-  await makeSureDbIsReady();
-
-  const { id, ...updatedData } = await req.json();
-
-  try {
-    const updatedTweet = await Tweet.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    });
-
-    return new Response(JSON.stringify(updatedTweet), { status: 200 });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "Error updating tweet" }), {
-      status: 500,
-    });
-  }
-}
-
-export async function DELETE(req,) {
-  await makeSureDbIsReady();
-
-  const { id } = await req.json();
-
-  try {
-    await Tweet.findByIdAndDelete(id);
-
-    return new Response(
-      JSON.stringify({ message: "Tweet deleted successfully" }),
-      { status: 200 }
-    );
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "Error deleting tweet" }), {
-      status: 500,
-    });
-  }
+  return Response.json(populatedTweet, { status: 201 });
 }

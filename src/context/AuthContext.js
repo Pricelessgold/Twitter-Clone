@@ -7,41 +7,34 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    async function checkUser() {
-      const res = await fetch("/api/auth/me");
+  async function checkUser() {
+    const res = await fetch("/api/auth/me", {
+      credentials: "include",
+    });
 
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      }
+    if (res.ok) {
+      const data = await res.json();
+      setUser(data.user);
+    } else {
+      setUser(null);
     }
+  }
 
+  useEffect(() => {
     checkUser();
   }, []);
 
-  async function login() {
-    await fetch("/api/auth/login", {
+  async function logout() {
+    await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });
 
-    setUser({
-      name: "Odose",
-      username: "greatestodose",
-    });
+    setUser(null);
   }
 
-  async function logout() {
-  await fetch("/api/auth/logout", {
-    method: "POST",
-  });
-
-  setUser(null);
-}
-
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, checkUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
