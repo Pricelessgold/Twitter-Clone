@@ -2,13 +2,16 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 async function getProfileData() {
   const cookieStore = await cookies();
   const authToken = cookieStore.get("authToken")?.value;
 
   if (!authToken) return null;
 
-  const res = await fetch("http://localhost:3000/api/auth/me", {
+  const res = await fetch(`${baseUrl}/api/auth/me`, {
     headers: {
       Cookie: `authToken=${authToken}`,
     },
@@ -22,7 +25,7 @@ async function getProfileData() {
 }
 
 async function getUserTweets() {
-  const res = await fetch("http://localhost:3000/api/tweets", {
+  const res = await fetch(`${baseUrl}/api/tweets`, {
     cache: "no-store",
   });
 
@@ -54,7 +57,6 @@ export default async function ProfilePage() {
           ← Back to Feed
         </Link>
 
-        {/* Profile Card */}
         <section className="rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-lg">
           <div className="flex items-center gap-6">
             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-4xl font-bold">
@@ -62,9 +64,7 @@ export default async function ProfilePage() {
             </div>
 
             <div>
-              <h1 className="text-4xl font-bold">
-                {user.username}
-              </h1>
+              <h1 className="text-4xl font-bold">{user.username}</h1>
 
               <p className="text-lg text-slate-400">
                 @{user.username}
@@ -72,39 +72,28 @@ export default async function ProfilePage() {
             </div>
           </div>
 
-          {/* Stats */}
           <div className="mt-8 border-t border-slate-800 pt-6">
             <div className="grid grid-cols-3 text-center">
               <div>
                 <p className="text-3xl font-bold">
                   {userTweets.length}
                 </p>
-
-                <p className="mt-1 text-slate-400">
-                  Tweets
-                </p>
+                <p className="mt-1 text-slate-400">Tweets</p>
               </div>
 
               <div>
                 <p className="text-3xl font-bold">0</p>
-
-                <p className="mt-1 text-slate-400">
-                  Followers
-                </p>
+                <p className="mt-1 text-slate-400">Followers</p>
               </div>
 
               <div>
                 <p className="text-3xl font-bold">0</p>
-
-                <p className="mt-1 text-slate-400">
-                  Following
-                </p>
+                <p className="mt-1 text-slate-400">Following</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* User Tweets */}
         <section className="mt-10">
           <h2 className="mb-5 text-4xl font-bold">
             Your Tweets
