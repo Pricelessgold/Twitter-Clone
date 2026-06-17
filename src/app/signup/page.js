@@ -68,7 +68,7 @@ export default function SignupPage() {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="greatestodose"
+              placeholder="username"
               className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 outline-none transition focus:border-blue-500"
             />
           </div>

@@ -68,6 +68,7 @@ export default function HomePage() {
 
             <button
               onClick={createTweet}
+               style={{ cursor: "pointer" }}
               className="mt-4 rounded-full bg-blue-600 px-8 py-3 font-bold hover:bg-blue-700"
             >
               Tweet

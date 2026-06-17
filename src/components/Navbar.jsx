@@ -15,12 +15,21 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6 text-base font-medium">
-          <Link href="/">Home</Link>
+          <Link href="/"
+          className="hover:text-blue-300">Home</Link>
 
           {user ? (
             <>
-              <Link href="/profile">Profile</Link>
-              <span>@{user.username}</span>
+              <Link href="/profile" className="hover:text-blue-300">
+                Profile
+              </Link>
+              <Link
+                href="/profile"
+                style={{ cursor: "pointer" }}
+                className="hover:text-blue-300"
+              >
+                @{user.username}
+              </Link>
               <LogoutButton />
             </>
           ) : (

@@ -17,7 +17,8 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="text-white hover:text-slate-200"
+      style={{ cursor: "pointer" }}
+      className="hover:text-blue-300"
     >
       Logout
     </button>
