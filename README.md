@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Twitter Clone
 
-## Getting Started
+A full-stack Twitter Clone built with Next.js, React, MongoDB Atlas, JWT Authentication, and Tailwind CSS. Users can create accounts, log in, post tweets,  view profiles, and manage their own content.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Authentication
+
+* User registration
+* User login
+* JWT-based authentication
+* Secure password hashing with bcrypt
+* Logout functionality
+* Protected routes using middleware
+
+### Tweets
+
+* Create tweets
+* View all tweets
+* View individual tweet details
+* Edit your own tweets
+* Delete your own tweets
+
+### Profile
+
+* View user profile
+* View all tweets created by a user
+* Tweet statistics
+
+### Deployment
+
+* Frontend and backend deployed on Vercel
+* Database hosted on MongoDB Atlas
+
+---
+
+## Tech Stack
+
+### Frontend
+
+* React
+* Next.js App Router
+* Tailwind CSS
+
+### Backend
+
+* Next.js API Routes
+* JWT Authentication
+* bcrypt
+
+### Database
+
+* MongoDB Atlas
+* Mongoose
+
+### Deployment
+
+* GitHub
+* Vercel
+
+---
+
+## Project Structure
+
+```txt
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   └── tweets/
+│   ├── login/
+│   ├── signup/
+│   ├── profile/
+│   ├── tweet/[id]/
+│   └── page.js
+│
+├── components/
+│   ├── Navbar.jsx
+│   ├── LogoutButton.jsx
+│   ├── VoteButtons.jsx
+│   └── TweetActions.jsx
+│
+├── context/
+│   └── AuthContext.js
+│
+├── lib/
+│   ├── auth.js
+│   └── mongodb.js
+│
+├── models/
+│   ├── User.js
+│   └── Tweet.js
+│
+└── middleware.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Authentication Flow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. User signs up
+2. Password is hashed using bcrypt
+3. User logs in
+4. JWT token is generated
+5. JWT token is stored in an HttpOnly cookie
+6. Protected routes verify the token
+7. Users can create and manage their own tweets
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Future Improvements
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* User avatars
+* Follow and unfollow users
+* Profile customization
+* Comments and replies
+* Image uploads
+* Notifications
+* Direct messaging
+* Likes and dislikes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## What I Learned
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Through this project, I learned:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* React fundamentals
+* Next.js App Router
+* REST API development
+* MongoDB and Mongoose
+* Authentication with JWT
+* Password hashing with bcrypt
+* Route protection with Middleware
+* State management with React Context
+* Deployment using Vercel
+* Cloud database management with MongoDB Atlas
+
+---
+
+
